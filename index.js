@@ -1,65 +1,52 @@
-const WebSocket = require('ws');
+#!/usr/bin/env node
+var WebSocketServer = require('websocket').server;
+var http = require('http');
 
-// Define the valid key
-const VALID_KEY = '800879';
-
-// Create a WebSocket server with 4 worker processes
-const wss = new WebSocket.Server({ port: 8080 });
-
-let clients = new Map(); // Stores all connected clients
-let authenticatedClients = new Map(); // Stores authenticated clients
-
-wss.on('connection', (ws) => {
-    // Assign a unique ID to each connection
-    const id = Date.now() + Math.random();
-    clients.set(id, ws);
-    
-    console.log(`New connection: ${id}`);
-
-    // Handle incoming messages
-    ws.on('message', (message) => {
-        let data;
-        try {
-            data = JSON.parse(message);
-        } catch (e) {
-            ws.send(JSON.stringify({ message: 'Invalid message format.', type: 'error' }));
-            return;
-        }
-
-        const { type, key } = data;
-
-        // Handle authentication
-        if (type === 'authenticate') {
-            if (key !== VALID_KEY) {
-                ws.send(JSON.stringify({ message: 'Invalid key.', type: 'error' }));
-                ws.close();
-                return;
-            }
-            authenticatedClients.set(id, ws);
-            ws.send(JSON.stringify({ message: 'Authentication successful.', type: 'notification' }));
-            return;
-        }
-
-        // Ensure the client is authenticated
-        if (!authenticatedClients.has(id)) {
-            ws.send(JSON.stringify({ message: 'You are not authenticated.', type: 'error' }));
-            return;
-        }
-
-        // Broadcast signaling messages to all authenticated clients except the sender
-        authenticatedClients.forEach((client, clientId) => {
-            if (clientId !== id) {
-                client.send(JSON.stringify(data));
-            }
-        });
-    });
-
-    // Handle connection closure
-    ws.on('close', () => {
-        clients.delete(id);
-        authenticatedClients.delete(id);
-        console.log(`Connection closed: ${id}`);
-    });
+var server = http.createServer(function (request, response) {
+    console.log((new Date()) + ' Received request for ' + request.url);
+    response.writeHead(404);
+    response.end();
+});
+server.listen(8080, function () {
+    console.log((new Date()) + ' Server is listening on port 8080');
 });
 
-console.log('WebSocket server is running on ws://localhost:8080');
+wsServer = new WebSocketServer({
+    httpServer: server,
+    // You should not use autoAcceptConnections for production
+    // applications, as it defeats all standard cross-origin protection
+    // facilities built into the protocol and the browser.  You should
+    // *always* verify the connection's origin and decide whether or not
+    // to accept it.
+    autoAcceptConnections: false
+});
+
+function originIsAllowed(origin) {
+    // put logic here to detect whether the specified origin is allowed.
+    return true;
+}
+
+wsServer.on('request', function (request) {
+    if (!originIsAllowed(request.origin)) {
+        // Make sure we only accept requests from an allowed origin
+        request.reject();
+        console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+        return;
+    }
+
+    var connection = request.accept('echo-protocol', request.origin);
+    console.log((new Date()) + ' Connection accepted.');
+    connection.on('message', function (message) {
+        if (message.type === 'utf8') {
+            console.log('Received Message: ' + message.utf8Data);
+            connection.sendUTF(message.utf8Data);
+        }
+        else if (message.type === 'binary') {
+            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+            connection.sendBytes(message.binaryData);
+        }
+    });
+    connection.on('close', function (reasonCode, description) {
+        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+    });
+});
