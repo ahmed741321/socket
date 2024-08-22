@@ -49,7 +49,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
     <script>
       // إنشاء اتصال بـ SockJS
-      const socket = new SockJS("http://localhost:3000/sockjs");
+      const socket = new SockJS("/sockjs");
 
       socket.onopen = function (e) {
         console.log("Connected!", e);
