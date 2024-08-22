@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const sockjs = require('sockjs');
 
-// إعداد التطبيق
 const app = express();
 const port = 3000;
 
@@ -15,20 +14,33 @@ app.get('/', (req, res) => {
 });
 
 // إعداد خادم SockJS
-const sockjsOptions = {
+const echo = sockjs.createServer({
     prefix: '/sockjs',
-};
+    // لا حاجة لتحديد رقم المنفذ هنا لأننا سنقوم بإعداد السيرفر الرئيسي للسماح بـ SockJS على نفس المنفذ
+});
 
-const echo = sockjs.createServer(sockjsOptions);
+let clients = [];
 
 echo.on('connection', function (conn) {
     console.log('Client connected');
+    clients.push(conn);
+
+    // إرسال إشعار لجميع العملاء عند اتصال عميل جديد
+    const joinMessage = JSON.stringify({
+        username: 'Server',
+        text: 'A new user has joined the chat.',
+    });
+
+    clients.forEach(client => {
+        if (client !== conn) {
+            client.write(joinMessage);
+        }
+    });
 
     conn.on('data', function (message) {
-        console.log('Received:', message);
-
+        //console.log('Received:', message);
         // إعادة إرسال الرسالة إلى جميع العملاء المتصلين
-        echo.clients.forEach(function (client) {
+        clients.forEach(client => {
             if (client !== conn) {
                 client.write(message);
             }
@@ -37,11 +49,23 @@ echo.on('connection', function (conn) {
 
     conn.on('close', function () {
         console.log('Client disconnected');
+        // إزالة العميل من قائمة العملاء
+        clients = clients.filter(client => client !== conn);
+
+        // إرسال إشعار لجميع العملاء عند مغادرة عميل
+        const leaveMessage = JSON.stringify({
+            username: 'Server',
+            text: 'A user has left the chat.',
+        });
+
+        clients.forEach(client => {
+            client.write(leaveMessage);
+        });
     });
 });
 
 const server = app.listen(port, () => {
-    console.log(`Server running on http://your-domain.com:${port}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
 
 echo.installHandlers(server);
