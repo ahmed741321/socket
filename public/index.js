@@ -164,12 +164,14 @@ function handleCallRequest(data) {
 }
 
 // بدء المكالمة
+// تكوين عناصر الصوت والفيديو
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const destination = audioContext.createMediaStreamDestination();
+
 function startCall(targetClientId, isVideo) {
-    // تحقق من حالة peerConnection
     if (peerConnection) {
         const signalingState = peerConnection.signalingState;
         if (signalingState !== 'stable') {
-            // أغلق الاتصال إذا كان في حالة غير مناسبة
             peerConnection.close();
             peerConnection = null;
         }
@@ -177,7 +179,6 @@ function startCall(targetClientId, isVideo) {
 
     peerConnection = new RTCPeerConnection(iceServers);
 
-    // تعيين حدث ontrack
     peerConnection.ontrack = event => {
         if (isVideo) {
             if (remoteVideo) {
@@ -235,6 +236,14 @@ function startCall(targetClientId, isVideo) {
         .catch(error => console.error('Error creating offer:', error));
 }
 
+// استخدام AudioContext لتوجيه الصوت
+navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+        const audioDevice = devices.find(device => device.kind === 'audiooutput');
+        if (audioDevice) {
+            remoteAudio.setSinkId(audioDevice.deviceId).catch(error => console.error('Error setting audio sink ID:', error));
+        }
+    });
 function handleOffer(data) {
     if (peerConnection) {
         const signalingState = peerConnection.signalingState;
