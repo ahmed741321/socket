@@ -1,0 +1,184 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.contacts {
+    width: 25%;
+    background-color: #fff;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+}
+
+.contacts h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+}
+
+.contacts ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contacts li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+.contacts li:hover {
+    background-color: #e9e9e9;
+}
+
+.chat {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.chat h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+}
+
+.messages {
+    flex-grow: 1;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ddd;
+    overflow-y: scroll;
+    height: 400px;
+}
+
+#messageInput {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#sendMessageBtn {
+    background-color: #4caf50;
+    color: white;
+}
+
+#callBtn,
+#videoCallBtn {
+    background-color: #2196f3;
+    color: white;
+}
+
+#callBtn:hover,
+#videoCallBtn:hover,
+#sendMessageBtn:hover {
+    background-color: #0d47a1;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+#remoteVideo {
+    width: 100%;
+    /* Ensure video fits well */
+    max-height: 400px;
+    /* Control video height */
+    border: 1px solid #ddd;
+    /* Optional border for better visibility */
+    border-radius: 8px;
+    /* Rounded corners */
+}
+
+button {
+    background-color: #4caf50;
+    /* Default button color */
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#acceptCallBtn {
+    background-color: #4caf50;
+}
+
+#rejectCallBtn {
+    background-color: #f44336;
+}
+
+#acceptCallBtn:hover {
+    background-color: #45a049;
+    /* Darker green */
+}
+
+#rejectCallBtn:hover {
+    background-color: #c62828;
+    /* Darker red */
+}
+
+#endCallBtn {
+    background-color: #f44336;
+}
+
+#endCallBtn:hover {
+    background-color: #d32f2f;
+    /* Darker red */
+}
+
+/* النمط الخاص بالعناصر في نمط المودال */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* حاوية الفيديو */
+.video-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+video {
+    width: 45%;
+    border: 1px solid #ddd;
+}
