@@ -15,6 +15,7 @@ const rejectCallBtn = document.getElementById('rejectCallBtn');
 const activeCallModal = document.getElementById('activeCallModal');
 const endCallBtn = document.getElementById('endCallBtn');
 const remoteVideo = document.getElementById('remoteVideo');
+const localVideo = document.getElementById('localVideo');
 
 // تكوين WebRTC
 const iceServers = {
@@ -53,15 +54,7 @@ connection.onmessage = function (e) {
         case 'call_reject':
         case 'call_ended':
         case 'call_rejected':
-            // التعامل مع رفض المكالمة أو إنهائها
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            activeCallModal.style.display = 'none'; // إخفاء نافذة الاتصال النشط
+            handleCallEnd();
             break;
         case 'ice_candidate':
             handleIceCandidate(data);
@@ -76,7 +69,6 @@ connection.onmessage = function (e) {
             console.warn('Unknown message type:', data.type);
     }
 };
-
 
 // تحديث قائمة جهات الاتصال
 function updateContactsList(contacts) {
@@ -114,6 +106,7 @@ function appendMessage(from, text) {
     messagesContainer.appendChild(message);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
 // بدء مكالمة صوتية
 callBtn.addEventListener('click', () => {
     if (currentChatUser) {
@@ -157,7 +150,6 @@ function handleCallRequest(data) {
             }
             // بدء مكالمة جديدة
             activeCallModal.style.display = 'flex';   // عرض نافذة الاتصال النشط
-            //startCall(data.from, isVideo);
         };
 
         rejectCallBtn.onclick = () => {
@@ -186,7 +178,6 @@ function startCall(targetClientId, isVideo) {
 
     // تعيين حدث ontrack
     peerConnection.ontrack = event => {
-        const remoteVideo = document.getElementById('remoteVideo');
         if (remoteVideo) {
             remoteVideo.srcObject = event.streams[0];
         } else {
@@ -199,7 +190,6 @@ function startCall(targetClientId, isVideo) {
             localStream = stream;
 
             // تعيين تدفق الوسائط المحلي إلى عنصر الفيديو المحلي
-            const localVideo = document.getElementById('localVideo');
             if (localVideo) {
                 localVideo.srcObject = localStream;
             }
@@ -246,7 +236,6 @@ function handleOffer(data) {
 
     // تعيين حدث ontrack
     peerConnection.ontrack = event => {
-        const remoteVideo = document.getElementById('remoteVideo');
         if (remoteVideo) {
             remoteVideo.srcObject = event.streams[0];
         } else {
@@ -260,7 +249,6 @@ function handleOffer(data) {
             localStream = stream;
 
             // تعيين تدفق الوسائط المحلي إلى عنصر الفيديو المحلي
-            const localVideo = document.getElementById('localVideo');
             if (localVideo) {
                 localVideo.srcObject = localStream;
             }
@@ -295,14 +283,6 @@ function handleIceCandidate(data) {
         .catch(error => console.error('Error adding ICE candidate:', error));
 }
 
-
-// التعامل مع مرشحي ICE
-function handleIceCandidate(data) {
-    const candidate = new RTCIceCandidate(data.candidate);
-    peerConnection.addIceCandidate(candidate)
-        .catch(error => console.error('Error adding ICE candidate:', error));
-}
-
 // إنهاء المكالمة
 endCallBtn.addEventListener('click', () => {
     if (peerConnection) {
@@ -322,11 +302,8 @@ endCallBtn.addEventListener('click', () => {
     }
 });
 
-
-
-
 // التعامل مع رفض المكالمة
-function handleCallReject(data) {
+function handleCallEnd() {
     if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -334,12 +311,5 @@ function handleCallReject(data) {
     if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
     }
-    // أرسل رسالة لإعلام الطرف الآخر برفض المكالمة
-    connection.send(JSON.stringify({
-        type: 'call_rejected',
-        targetClientId: data.from
-    }));
     activeCallModal.style.display = 'none'; // إخفاء نافذة الاتصال النشط
 }
-
-

@@ -22,7 +22,6 @@ let clients = {}; // clientId -> connection
 let contacts = []; // List of contact names (in a real scenario, this might be more dynamic)
 
 // Handle WebSocket connections
-// Handle WebSocket connections
 websocket.on('connection', function (conn) {
     console.log('Client connected');
     let clientId = null;
@@ -115,7 +114,6 @@ websocket.on('connection', function (conn) {
     });
 });
 
-
 // Function to broadcast the contact list to all connected clients
 function broadcastContacts() {
     const contactMessage = JSON.stringify({
@@ -127,6 +125,7 @@ function broadcastContacts() {
         conn.write(contactMessage);
     });
 }
+
 const server = app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
