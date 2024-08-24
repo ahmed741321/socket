@@ -1,57 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat App</title>
     <link rel="stylesheet" href="/styles.css" />
     <script src="/sockjs.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <!-- قائمة جهات الاتصال -->
-        <div class="contacts">
-            <h2>Contacts</h2>
-            <ul id="contactsList">
-                <!-- سيتم ملء جهات الاتصال هنا عبر JavaScript -->
-            </ul>
-        </div>
+      <!-- قائمة جهات الاتصال -->
+      <div class="contacts">
+        <h2>Contacts</h2>
+        <ul id="contactsList">
+          <!-- سيتم ملء جهات الاتصال هنا عبر JavaScript -->
+        </ul>
+      </div>
 
-        <!-- منطقة المحادثة -->
-        <div class="chat">
-            <h2>Chat with <span id="chatWith">Select a contact</span></h2>
-            <div id="messages" class="messages">
-                <!-- الرسائل تظهر هنا -->
-            </div>
-            <input type="text" id="messageInput" placeholder="Type a message..." />
-            <button id="sendMessageBtn">Send</button>
-            <button id="callBtn">Call</button>
-            <button id="videoCallBtn">Video Call</button>
+      <!-- منطقة المحادثة -->
+      <div class="chat">
+        <h2>Chat with <span id="chatWith">Select a contact</span></h2>
+        <div id="messages" class="messages">
+          <!-- الرسائل تظهر هنا -->
         </div>
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendMessageBtn">Send</button>
+        <button id="callBtn">Call</button>
+        <button id="videoCallBtn">Video Call</button>
+      </div>
     </div>
 
     <!-- Call Request Modal -->
     <div id="callRequestModal" class="modal">
-        <div class="modal-content">
-            <p id="callRequestMessage"></p>
-            <button id="acceptCallBtn">Accept</button>
-            <button id="rejectCallBtn">Reject</button>
-        </div>
+      <div class="modal-content">
+        <p id="callRequestMessage"></p>
+        <button id="acceptCallBtn">Accept</button>
+        <button id="rejectCallBtn">Reject</button>
+      </div>
     </div>
 
     <!-- Modal for active call -->
     <div id="activeCallModal" class="modal">
-        <div class="modal-content">
-            <h2>Active Call</h2>
-            <!-- Video elements for both caller and receiver -->
-            <div class="video-container">
-                <video id="localVideo" autoplay muted></video>
-                <video id="remoteVideo" autoplay ></video>
-            </div>
-            <button id="endCallBtn">End Call</button>
+      <div class="modal-content">
+        <h2>Active Call</h2>
+        <!-- Video elements for both caller and receiver -->
+        <div class="video-container">
+          <audio id="remoteAudio" autoplay></audio>
+          <video id="localVideo" autoplay muted></video>
+          <video id="remoteVideo" autoplay></video>
         </div>
+        <button id="endCallBtn">End Call</button>
+      </div>
     </div>
 
     <script src="/index.js"></script>
-</body>
+  </body>
 </html>

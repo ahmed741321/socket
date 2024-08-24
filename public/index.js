@@ -16,6 +16,7 @@ const activeCallModal = document.getElementById('activeCallModal');
 const endCallBtn = document.getElementById('endCallBtn');
 const remoteVideo = document.getElementById('remoteVideo');
 const localVideo = document.getElementById('localVideo');
+const remoteAudio = document.getElementById('remoteAudio'); // إضافة عنصر الصوت
 
 // تكوين WebRTC
 const iceServers = {
@@ -178,10 +179,22 @@ function startCall(targetClientId, isVideo) {
 
     // تعيين حدث ontrack
     peerConnection.ontrack = event => {
-        if (remoteVideo) {
-            remoteVideo.srcObject = event.streams[0];
+        if (isVideo) {
+            if (remoteVideo) {
+                remoteVideo.srcObject = event.streams[0];
+            } else {
+                console.error('Remote video element not found');
+            }
         } else {
-            console.error('Remote video element not found');
+            if (remoteAudio) {
+                remoteAudio.srcObject = event.streams[0];
+                // ضبط الصوت لتشغيله عبر مكبر الصوت (إذا كان supported)
+                if (remoteAudio.setSinkId) {
+                    remoteAudio.setSinkId('default').catch(error => console.error('Error setting sink ID:', error));
+                }
+            } else {
+                console.error('Remote audio element not found');
+            }
         }
     };
 
@@ -236,10 +249,22 @@ function handleOffer(data) {
 
     // تعيين حدث ontrack
     peerConnection.ontrack = event => {
-        if (remoteVideo) {
-            remoteVideo.srcObject = event.streams[0];
+        if (data.isVideo) {
+            if (remoteVideo) {
+                remoteVideo.srcObject = event.streams[0];
+            } else {
+                console.error('Remote video element not found');
+            }
         } else {
-            console.error('Remote video element not found');
+            if (remoteAudio) {
+                remoteAudio.srcObject = event.streams[0];
+                // ضبط الصوت لتشغيله عبر مكبر الصوت (إذا كان supported)
+                if (remoteAudio.setSinkId) {
+                    remoteAudio.setSinkId('default').catch(error => console.error('Error setting sink ID:', error));
+                }
+            } else {
+                console.error('Remote audio element not found');
+            }
         }
     };
 
